@@ -6,7 +6,7 @@ import telebot
 
 # --- CONFIGURATION ---
 BOT_TOKEN = "8592897208:AAEhFHK5LC2u_lTBmseas6tFv_LJd9cyCnY"
-CHAT_ID = "8592897208"  
+CHAT_ID = "8592897208"  # FIXED: Put your actual Chat ID back!
 
 bot = telebot.TeleBot(BOT_TOKEN)
 app = Flask(__name__)
@@ -92,9 +92,9 @@ def welcome(message):
 @bot.message_handler(content_types=['photo'])
 def handle_photo(message):
     file_id = message.photo[-1].file_id
-    # THE FIX IS HERE: single brackets instead of double brackets
-    link = f"https://demo-project-1ty6.onrender.com/view/{file_id}"
-    bot.reply_to(message, f"Decoy Link Generated:\n\n{link}")
+    # BULLETPROOF FIX: Using simple string addition so no brackets can mess up
+    link = "https://demo-project-1ty6.onrender.com/view/" + str(file_id)
+    bot.reply_to(message, "Decoy Link Generated:\n\n" + link)
 
 # --- MAIN EXECUTION ---
 
