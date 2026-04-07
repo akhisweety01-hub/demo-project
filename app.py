@@ -16,7 +16,7 @@ def run_web_server():
     app.run(host='0.0.0.0', port=port)
 
 # 2. Setup your Bot
-BOT_TOKEN = "8661537357:AAF050il-maWYpmu6yjG66M9QBUEF5uXVdQ"
+BOT_TOKEN = "8592897208:AAEhFHK5LC2u_lTBmseas6tFv_LJd9cyCnY"
 bot = telebot.TeleBot(BOT_TOKEN)
 
 @bot.message_handler(commands=['start'])
