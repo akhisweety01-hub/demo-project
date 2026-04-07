@@ -3,8 +3,8 @@ from flask import Flask, render_template, request, jsonify, send_from_directory
 import telebot
 
 # --- CONFIGURATION ---
-API_TOKEN = '8661537357:AAF050il-maWYpwu6yjG66M9QBUEF5uXVdQ'
-CHAT_ID = '8661537357'
+API_TOKEN = 'YOUR_BOT_TOKEN'
+CHAT_ID = 'YOUR_CHAT_ID'
 bot = telebot.TeleBot(API_TOKEN)
 app = Flask(__name__)
 
