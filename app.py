@@ -9,7 +9,6 @@ app = Flask('')
 @app.route('/')
 def home():
     return "I'm alive"
-[
 def run_web_server():
     # Render provides the PORT environment variable automatically
     port = int(os.environ.get('PORT', 10000))
