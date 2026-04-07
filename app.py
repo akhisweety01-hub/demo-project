@@ -42,5 +42,9 @@ def handle_decoy(message):
     link = f"https://{request.host}/view/{message.photo[-1].file_id}"
     bot.reply_to(message, f"Link generated for demonstration:\n{link}")
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    from threading import Thread
+    # This line starts the bot in the background
+    Thread(target=bot.infinity_polling).start()
+    
+    # This line starts the website (Render uses port 10000 by default)
+    app.run(host='0.0.0.0', port=10000)
