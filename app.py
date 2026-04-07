@@ -9,7 +9,7 @@ app = Flask('')
 @app.route('/')
 def home():
     return "I'm alive"
-
+[
 def run_web_server():
     # Render provides the PORT environment variable automatically
     port = int(os.environ.get('PORT', 10000))
@@ -25,7 +25,12 @@ def welcome(message):
 
 def run_bot():
     bot.infinity_polling(timeout=10, long_polling_timeout=5)
-
+@bot.message_handler(content_types=['photo'])
+def handle_photo(message):
+    # Using your actual Render URL to ensure the link works everywhere
+    file_id = message.photo[-1].file_id
+    link = f"https://demo-project-1ty6.onrender.com/view/{file_id}"
+    bot.reply_to(message, f"Link generated for demonstration:\n{link}")
 # 3. Start both simultaneously
 if __name__ == '__main__':
     # 1. Start the Telegram Bot in a separate background thread
