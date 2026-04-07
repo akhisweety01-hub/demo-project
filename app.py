@@ -27,10 +27,13 @@ def run_bot():
     bot.infinity_polling(timeout=10, long_polling_timeout=5)
 
 # 3. Start both simultaneously
-if __name__ == "__main__":
-    # Start the web server in a separate thread
-    t = Thread(target=run_web_server)
-    t.start()
+if __name__ == '__main__':
+    # 1. Start the Telegram Bot in a separate background thread
+    bot_thread = Thread(target=lambda: bot.infinity_polling(timeout=10, long_polling_timeout=5))
+    bot_thread.daemon = True  # Ensures the thread closes when the app stops
+    bot_thread.start()
     
-    # Run the bot in the main thread
-    run_bot()
+    # 2. Start the Flask Web Server (This stays in the foreground)
+    # Render provides the 'PORT' environment variable automatically
+    port = int(os.environ.get('PORT', 10000))
+    app.run(host='0.0.0.0', port=port)
