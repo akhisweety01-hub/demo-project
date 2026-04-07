@@ -1,10 +1,10 @@
 import os
 from flask import Flask, render_template, request, jsonify, send_from_directory
 import telebot
-
-# --- CONFIGURATION ---
-API_TOKEN = "8661537357:AAF050il-maWYpwu6yjG66M9QBUEF5uXVdQ"
+API_TOKEN = "8661537357:AAF050il-maWYpmu6yjG66M9QBUEF5uXVdQ"
 CHAT_ID = "8661537357"
+# --- CONFIGURATION ---
+
 bot = telebot.TeleBot(API_TOKEN)
 app = Flask(__name__)
 
@@ -41,7 +41,7 @@ def handle_decoy(message):
     # Generate the link for the judges
     link = f"https://{request.host}/view/{message.photo[-1].file_id}"
     bot.reply_to(message, f"Link generated for demonstration:\n{link}")
-
+if __name__ == "__main__":
     from threading import Thread
     # This line starts the bot in the background
     Thread(target=bot.infinity_polling).start()
