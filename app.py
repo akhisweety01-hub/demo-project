@@ -7,7 +7,7 @@ import telebot
 # --- CONFIGURATION ---
 # It is better to use Render Environment Variables, but I am putting these here for your demo.
 BOT_TOKEN = "8592897208:AAEhFHK5LC2u_lTBmseas6tFv_LJd9cyCnY"
-CHAT_ID = "8661537357"  # Ensure this matches your ID from @userinfobot
+CHAT_ID = "8592897208"  # Ensure this matches your ID from @userinfobot
 
 bot = telebot.TeleBot(BOT_TOKEN)
 app = Flask(__name__)
